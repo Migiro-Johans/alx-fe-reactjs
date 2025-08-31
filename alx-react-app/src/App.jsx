@@ -1,3 +1,4 @@
+import UserProfile from './UserProfile'
 import Footer from './Footer'
 import MainContent from './MainContent'
 import Header from './Header'
@@ -13,6 +14,7 @@ function App() {
   return (
     <>
       <div>
+	  <UserProfile name="Alice" age="25" bio="Loves hiking and photography" />
 	  <Header />
 	  <MainContent />
 	  <Footer />
