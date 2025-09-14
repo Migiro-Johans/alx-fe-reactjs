@@ -7,6 +7,7 @@ function App() {
 	  <UserContext.Provider value={userData}>
 	  <ProfilePage />
 	  </UserContext.Provider>
+  );
 }
 
 
