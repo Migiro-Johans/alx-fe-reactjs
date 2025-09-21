@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import RecipeList from './components/RecipeList.jsx'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Router, Link } from 'react-router-dom'
 import AddRecipeForm from './components/AddRecipeForm.jsx'
 import RecipeDetails from './components/RecipeDetails'
 function App() {
@@ -24,7 +24,7 @@ function App() {
 
 export default App(){
   return (
-    <>
+    <Router>
       <header style={{ padding: "1rem" }}>
         <Link to="/" style={{ textDecoration: "none" }}>
           Home
@@ -35,6 +35,6 @@ export default App(){
         <Route path="/" element={<Home />} />
         <Route path="/recipes/:id" element={<RecipeDetails />} />
       </Routes>
-    </>
+    </Router>
   );
 }
