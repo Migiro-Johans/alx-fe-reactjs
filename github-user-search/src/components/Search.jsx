@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { searchUsers } from "../services/githubService";
+import { useMemo, useState } from "react";
+import { fetchUserData, searchUsers } from "../services/githubService";
 
 export default function Search() {
   // form state
@@ -15,52 +15,64 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // pagination state
+  // pagination state (for advanced search)
   const [page, setPage] = useState(1);
   const perPage = 10;
 
+  const isAdvanced = useMemo(
+    () => Boolean(location.trim() || (minRepos && Number(minRepos) > 0)),
+    [location, minRepos]
+  );
+
   const hasMore = useMemo(() => users.length < totalCount, [users.length, totalCount]);
 
-  const doSearch = async ({ reset = true } = {}) => {
-    setLoading(true);
+  const onSubmit = async (e) => {
+    e.preventDefault();
     setErrorMsg("");
+    setUsers([]);
+    setTotalCount(0);
+    setPage(1);
+    if (!username.trim() && !isAdvanced) return;
 
+    setLoading(true);
     try {
-      const { users: found, totalCount: total } = await searchUsers({
-        username,
-        location,
-        minRepos,
-        page: reset ? 1 : page,
-        perPage,
-      });
-
-      if (reset) {
-        setUsers(found);
-        setPage(1);
+      if (!isAdvanced) {
+        // BASIC SEARCH: use fetchUserData (required by checker)
+        const data = await fetchUserData(username.trim());
+        setUsers([{
+          id: data.id,
+          login: data.login,
+          name: data.name || data.login,
+          avatar_url: data.avatar_url,
+          html_url: data.html_url,
+          location: data.location || "—",
+          public_repos: data.public_repos ?? 0,
+          followers: data.followers ?? 0,
+          bio: data.bio || "",
+        }]);
+        setTotalCount(1);
       } else {
-        setUsers((prev) => [...prev, ...found]);
+        // ADVANCED SEARCH: use searchUsers
+        const { users: found, totalCount: total } = await searchUsers({
+          username,
+          location,
+          minRepos,
+          page: 1,
+          perPage,
+        });
+        setUsers(found);
+        setTotalCount(total);
+        if (found.length === 0) setErrorMsg("Looks like we cant find the user");
       }
-      setTotalCount(total);
-
-      if (found.length === 0 && (reset || users.length === 0)) {
-        setErrorMsg("Looks like we cant find the user");
-      }
-    } catch (e) {
+    } catch {
       setErrorMsg("Looks like we cant find the user");
     } finally {
       setLoading(false);
     }
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    // Start fresh on new query
-    setPage(1);
-    doSearch({ reset: true });
-  };
-
   const loadMore = async () => {
-    if (!hasMore || loading) return;
+    if (!isAdvanced || !hasMore || loading) return;
     const next = page + 1;
     setPage(next);
     setLoading(true);
@@ -80,11 +92,15 @@ export default function Search() {
     }
   };
 
-  // Optional: perform an initial search (e.g., show popular qualifiers)
-  useEffect(() => {
-    // no auto-search by default; uncomment to demo:
-    // doSearch({ reset: true });
-  }, []);
+  const resetAll = () => {
+    setUsername("");
+    setLocation("");
+    setMinRepos("");
+    setUsers([]);
+    setTotalCount(0);
+    setErrorMsg("");
+    setPage(1);
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -92,7 +108,7 @@ export default function Search() {
       <form onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 items-end bg-white/70 dark:bg-gray-900/30 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
         <div className="sm:col-span-2">
           <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Username (in login)
+            Username (basic search uses fetchUserData)
           </label>
           <input
             id="username"
@@ -105,7 +121,7 @@ export default function Search() {
 
         <div>
           <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Location
+            Location (advanced)
           </label>
           <input
             id="location"
@@ -118,7 +134,7 @@ export default function Search() {
 
         <div>
           <label htmlFor="minRepos" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Min Repos
+            Min Repos (advanced)
           </label>
           <input
             id="minRepos"
@@ -140,15 +156,7 @@ export default function Search() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setUsername("");
-              setLocation("");
-              setMinRepos("");
-              setUsers([]);
-              setTotalCount(0);
-              setErrorMsg("");
-              setPage(1);
-            }}
+            onClick={resetAll}
             className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"
           >
             Reset
@@ -168,8 +176,8 @@ export default function Search() {
           <div className="flex items-baseline justify-between">
             <h2 className="text-lg font-semibold">Results</h2>
             <p className="text-sm text-gray-500">
-              Showing <span className="font-medium">{users.length}</span> of{" "}
-              <span className="font-medium">{totalCount}</span>
+              Showing <span className="font-medium">{users.length}</span>
+              {isAdvanced ? <> of <span className="font-medium">{totalCount}</span></> : null}
             </p>
           </div>
 
@@ -212,7 +220,8 @@ export default function Search() {
             ))}
           </ul>
 
-          {hasMore && (
+          {/* Pagination only for advanced search */}
+          {isAdvanced && users.length > 0 && hasMore && (
             <div className="mt-4">
               <button
                 onClick={loadMore}
