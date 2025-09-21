@@ -6,6 +6,7 @@ import RecipeList from './components/RecipeList.jsx'
 import { Routes, Route, Router, Link } from 'react-router-dom'
 import AddRecipeForm from './components/AddRecipeForm.jsx'
 import RecipeDetails from './components/RecipeDetails'
+import SearchBar from './components/SearchBar.jsx'
 function App() {
   const [Recipe, newRecipe] = useState();
 
@@ -13,6 +14,7 @@ function App() {
     <>
 	  <div>
 	  <h1> Recipe Sharing App </h1>
+	  	<SearchBar/>
 	  	<RecipeList/>
 	  </div>
 	  <div>
