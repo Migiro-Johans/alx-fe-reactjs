@@ -1,6 +1,6 @@
 import Search from "./components/Search";
 
-export default function App() {
+function App() {
   return (
     <div className="mx-auto max-w-5xl p-4">
       <h1 className="text-2xl font-bold mb-4">GitHub User Search</h1>
@@ -8,4 +8,4 @@ export default function App() {
     </div>
   );
 }
-
+export default App;
