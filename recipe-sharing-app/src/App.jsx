@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import RecipeList from './components/RecipeList.jsx'
 import { Routes, Route, Router, Link } from 'react-router-dom'
 import AddRecipeForm from './components/AddRecipeForm.jsx'
 import RecipeDetails from './components/RecipeDetails'
 import SearchBar from './components/SearchBar.jsx'
+import FavoritesList from './components/FavoritesList.jsx'
+import RecommendationsList from './components/RecommendationsList.jsx'
 function App() {
   const [Recipe, newRecipe] = useState();
 
@@ -19,6 +19,8 @@ function App() {
 	  </div>
 	  <div>
 	 	<AddRecipeForm/>
+	  	<FavoritesList />
+	  	<RecommendationsList />
 	  </div>
     </>
   )
