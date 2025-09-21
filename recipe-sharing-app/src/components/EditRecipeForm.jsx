@@ -10,13 +10,12 @@ const EditRecipeForm = ({ recipeId }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // keep form in sync if store changes
     setTitle(recipe?.title || "");
     setDescription(recipe?.description || "");
   }, [recipe?.title, recipe?.description]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault(); // <-- required literal
     if (!title.trim()) {
       setError("Title is required.");
       return;
@@ -37,13 +36,13 @@ const EditRecipeForm = ({ recipeId }) => {
         type="text"
         placeholder="Title"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(event) => setTitle(event.target.value)}
         style={{ display: "block", width: "100%", marginBottom: ".5rem" }}
       />
       <textarea
         placeholder="Description"
         value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        onChange={(event) => setDescription(event.target.value)}
         style={{ display: "block", width: "100%", minHeight: 90, marginBottom: ".5rem" }}
       />
       <button type="submit">Save Changes</button>
