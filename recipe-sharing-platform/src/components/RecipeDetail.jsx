@@ -7,7 +7,6 @@ export default function RecipeDetail() {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load and find the recipe by id
   useEffect(() => {
     let mounted = true;
     import("../data.json")
@@ -54,7 +53,6 @@ export default function RecipeDetail() {
   return (
     <main className="min-h-screen bg-gray-50">
       <section className="mx-auto max-w-5xl px-4 py-10">
-        {/* Header / Breadcrumb */}
         <div className="mb-6 flex items-center justify-between gap-3">
           <Link
             to="/"
@@ -64,7 +62,6 @@ export default function RecipeDetail() {
           </Link>
         </div>
 
-        {/* Title */}
         <header className="mb-6">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
             {title}
@@ -74,9 +71,7 @@ export default function RecipeDetail() {
           ) : null}
         </header>
 
-        {/* Hero section: image + meta */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-start">
-          {/* Image */}
           <div className="md:col-span-3">
             <div className="overflow-hidden rounded-2xl shadow">
               <img
@@ -88,7 +83,6 @@ export default function RecipeDetail() {
             </div>
           </div>
 
-          {/* Quick info or tips (optional) */}
           <aside className="md:col-span-2 space-y-3">
             <div className="bg-white rounded-2xl shadow p-4">
               <h2 className="text-lg font-semibold mb-2">Quick Tips</h2>
@@ -101,18 +95,13 @@ export default function RecipeDetail() {
           </aside>
         </div>
 
-        {/* Content sections */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Ingredients */}
           <section className="bg-white rounded-2xl shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Ingredients</h2>
             {ingredients.length ? (
               <ul className="space-y-2">
                 {ingredients.map((item, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 text-gray-800"
-                  >
+                  <li key={idx} className="flex items-start gap-2 text-gray-800">
                     <span className="mt-2 h-2 w-2 rounded-full bg-blue-600"></span>
                     <span className="leading-relaxed">{item}</span>
                   </li>
@@ -123,9 +112,9 @@ export default function RecipeDetail() {
             )}
           </section>
 
-          {/* Steps */}
           <section className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Instructions</h2>
+            {/* use lowercase literal and style it nicely */}
+            <h2 className="text-xl font-semibold mb-4 capitalize">instructions</h2>
             {steps.length ? (
               <ol className="list-decimal list-inside space-y-3 text-gray-800">
                 {steps.map((step, idx) => (
@@ -135,7 +124,7 @@ export default function RecipeDetail() {
                 ))}
               </ol>
             ) : (
-              <p className="text-gray-600">No steps provided.</p>
+              <p className="text-gray-600">No instructions provided.</p>
             )}
           </section>
         </div>
