@@ -51,9 +51,13 @@ function HomePage() {
                        sm:grid-cols-2
                        lg:grid-cols-3
                        xl:grid-cols-4"
-          >
-            {recipes.map((r) => (
-              <RecipeCard key={r.id} recipe={r} />
+        >
+  {recipes.map((r) => (
+    <div
+      key={r.id}
+      className="hover:shadow-lg hover:-translate-y-0.5 transition transform rounded-xl">
+      <RecipeCard recipe={r} />
+	  </div>
             ))}
           </div>
         )}
