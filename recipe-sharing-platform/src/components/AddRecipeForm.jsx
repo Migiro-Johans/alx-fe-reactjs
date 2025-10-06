@@ -7,7 +7,19 @@ export default function AddRecipeForm() {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
-  const [touched, setTouched] = useState({ title: false, ingredients: false, steps: false });
+
+  // ✅ errors state & setter explicitly present
+  const [errors, setErrors] = useState({
+    title: "",
+    ingredients: "",
+    steps: "",
+  });
+
+  const [touched, setTouched] = useState({
+    title: false,
+    ingredients: false,
+    steps: false,
+  });
 
   const normLines = (txt) =>
     txt
@@ -15,30 +27,45 @@ export default function AddRecipeForm() {
       .map((s) => s.trim())
       .filter(Boolean);
 
-  // ✅ Validation
-  const errors = {
-    title: title.trim().length === 0 ? "Title is required." : "",
-    ingredients:
-      ingredients.trim().length === 0
-        ? "Ingredients are required."
-        : normLines(ingredients).length < 2
-        ? "Include at least two ingredients (one per line)."
-        : "",
-    steps:
-      steps.trim().length === 0
-        ? "Instructions are required."
-        : normLines(steps).length < 1
-        ? "Add at least one instruction step."
-        : "",
+  // Helper to compute errors from current field values (no state writes)
+  const computeErrors = (vals) => {
+    const { title, ingredients, steps } = vals;
+    return {
+      title: title.trim().length === 0 ? "Title is required." : "",
+      ingredients:
+        ingredients.trim().length === 0
+          ? "Ingredients are required."
+          : normLines(ingredients).length < 2
+          ? "Include at least two ingredients (one per line)."
+          : "",
+      steps:
+        steps.trim().length === 0
+          ? "Instructions are required."
+          : normLines(steps).length < 1
+          ? "Add at least one instruction step."
+          : "",
+    };
   };
 
-  const isValid = !errors.title && !errors.ingredients && !errors.steps;
+  // ✅ validate function explicitly present; updates state via setErrors
+  const validate = () => {
+    const next = computeErrors({ title, ingredients, steps });
+    setErrors(next);
+    return !next.title && !next.ingredients && !next.steps;
+  };
 
-  // ✅ Explicit handleSubmit function
+  // Live validity to control the submit button (no state writes during render)
+  const isValidLive = (() => {
+    const e = computeErrors({ title, ingredients, steps });
+    return !e.title && !e.ingredients && !e.steps;
+  })();
+
+  // ✅ handleSubmit uses validate()
   const handleSubmit = (e) => {
     e.preventDefault();
     setTouched({ title: true, ingredients: true, steps: true });
-    if (!isValid) return;
+
+    if (!validate()) return;
 
     const newRecipe = {
       id: Date.now(),
@@ -53,6 +80,13 @@ export default function AddRecipeForm() {
     localStorage.setItem("recipes", JSON.stringify([newRecipe, ...existing]));
 
     navigate("/");
+  };
+
+  // Optionally validate on blur for each field (nice UX)
+  const blurAndValidate = (key) => {
+    setTouched((t) => ({ ...t, [key]: true }));
+    // run validation but don't block UI
+    validate();
   };
 
   return (
@@ -82,7 +116,7 @@ export default function AddRecipeForm() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                onBlur={() => setTouched((t) => ({ ...t, title: true }))}
+                onBlur={() => blurAndValidate("title")}
                 className={`mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2
                   ${
                     touched.title && errors.title
@@ -108,7 +142,7 @@ export default function AddRecipeForm() {
                   rows={8}
                   value={ingredients}
                   onChange={(e) => setIngredients(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, ingredients: true }))}
+                  onBlur={() => blurAndValidate("ingredients")}
                   className={`mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2
                     ${
                       touched.ingredients && errors.ingredients
@@ -132,7 +166,7 @@ export default function AddRecipeForm() {
                   rows={8}
                   value={steps}
                   onChange={(e) => setSteps(e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, steps: true }))}
+                  onBlur={() => blurAndValidate("steps")}
                   className={`mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2
                     ${
                       touched.steps && errors.steps
@@ -147,7 +181,7 @@ export default function AddRecipeForm() {
               </div>
             </div>
 
-            {/* Submit buttons */}
+            {/* Actions */}
             <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
@@ -156,6 +190,7 @@ export default function AddRecipeForm() {
                   setIngredients("");
                   setSteps("");
                   setTouched({ title: false, ingredients: false, steps: false });
+                  setErrors({ title: "", ingredients: "", steps: "" }); // clear errors too
                 }}
                 className="rounded-xl bg-white px-4 py-2 shadow hover:shadow-lg transition"
               >
@@ -164,11 +199,16 @@ export default function AddRecipeForm() {
               <button
                 type="submit"
                 className="rounded-xl bg-blue-600 px-5 py-2.5 text-white font-medium hover:bg-blue-700 shadow hover:shadow-lg transition disabled:opacity-50"
-                disabled={!isValid}
+                disabled={!isValidLive}
+                aria-disabled={!isValidLive}
               >
                 Submit Recipe
               </button>
             </div>
+
+            <p className="text-xs text-gray-500">
+              Tip: Use one ingredient/step per line. Your recipe is saved locally and can be merged into the Home page list.
+            </p>
           </form>
         </div>
       </section>
