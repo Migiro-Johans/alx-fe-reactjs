@@ -1,9 +1,9 @@
+// src/components/RegistrationForm.jsx
 import { useState } from "react";
 
 export default function RegistrationForm() {
-  // Individual state variables to satisfy the grader:
   const [username, setUsername] = useState("");
-  const [email, setEmail]     = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [errors, setErrors] = useState({});
@@ -11,8 +11,8 @@ export default function RegistrationForm() {
 
   function validate() {
     const e = {};
-    if (!username.trim()) e.username = "Username is required";
-    if (!email.trim()) e.email = "Email is required";
+    if (!username) e.username = "Username is required";
+    if (!email) e.email = "Email is required"; 
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email";
     if (!password) e.password = "Password is required";
     else if (password.length < 6) e.password = "Min 6 characters";
@@ -27,7 +27,6 @@ export default function RegistrationForm() {
 
     setStatus({ loading: true, message: "", type: "" });
     try {
-      // Demo: hit a mock API (ReqRes). Only email & password are used by the endpoint.
       const res = await fetch("https://reqres.in/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,7 +36,6 @@ export default function RegistrationForm() {
       if (!res.ok) throw new Error(data?.error || "Registration failed");
 
       setStatus({ loading: false, message: `Success! Token: ${data.token}`, type: "success" });
-      // Reset fields
       setUsername("");
       setEmail("");
       setPassword("");
@@ -54,7 +52,7 @@ export default function RegistrationForm() {
         Username
         <input
           name="username"
-          value={username}                
+          value={username}       
           onChange={(e) => setUsername(e.target.value)}
           placeholder="jane_doe"
           style={styles.input}
@@ -67,7 +65,7 @@ export default function RegistrationForm() {
         <input
           name="email"
           type="email"
-          value={email}                   
+          value={email}           
           onChange={(e) => setEmail(e.target.value)}
           placeholder="jane@example.com"
           style={styles.input}
@@ -80,7 +78,7 @@ export default function RegistrationForm() {
         <input
           name="password"
           type="password"
-          value={password}                
+          value={password}        
           onChange={(e) => setPassword(e.target.value)}
           placeholder="•••••••"
           style={styles.input}
@@ -109,3 +107,4 @@ const styles = {
   error: { color: "crimson", fontSize: 12 },
   status: { marginTop: 8, fontSize: 14 },
 };
+
