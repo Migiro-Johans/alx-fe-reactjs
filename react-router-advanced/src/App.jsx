@@ -6,10 +6,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
-import Profile from "./pages/Profile";
-import ProfileDetails from "./pages/ProfileDetails";
-import ProfileSettings from "./pages/ProfileSettings";
-import NotFound from "./pages/NotFound";
+import Profile from "./components/Profile"; 
 
 export default function App() {
   return (
@@ -26,11 +23,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
 
-            {/* Dynamic route example */}
+            {/* Blog list and dynamic route */}
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:postId" element={<BlogPost />} />
-
-            {/* Protected route + nested routes */}
+            <Route path="/blog/:id" element={<BlogPost />} />
+            {/* Protected parent; nested routes are defined inside Profile.jsx */}
             <Route
               path="/profile"
               element={
@@ -38,16 +34,12 @@ export default function App() {
                   <Profile />
                 </ProtectedRoute>
               }
-            >
-              {/* Nested routes under /profile */}
-              <Route index element={<ProfileDetails />} />
-              <Route path="settings" element={<ProfileSettings />} />
-            </Route>
+            />
 
             <Route path="/login" element={<Login />} />
 
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
+            {/* 404 */}
+            <Route path="*" element={<div>404 — Not Found</div>} />
           </Routes>
         </div>
       </BrowserRouter>
