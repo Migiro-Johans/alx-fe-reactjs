@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import TodoList from "../components/TodoList";
 
 describe("TodoList", () => {
@@ -22,9 +23,7 @@ describe("TodoList", () => {
 
   test("toggles a todo on click", () => {
     render(<TodoList />);
-
     const item = screen.getByText("Learn React");
-    // not completed initially
     expect(item.closest("li")).not.toHaveStyle({ textDecoration: "line-through" });
 
     fireEvent.click(item);
@@ -36,11 +35,8 @@ describe("TodoList", () => {
 
   test("deletes a todo", () => {
     render(<TodoList />);
-
-    // delete "Build Todo App"
     const delBtn = screen.getByRole("button", { name: /delete-Build Todo App/i });
     fireEvent.click(delBtn);
-
     expect(screen.queryByText("Build Todo App")).not.toBeInTheDocument();
   });
 });
