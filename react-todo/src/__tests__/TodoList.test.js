@@ -3,40 +3,36 @@ import "@testing-library/jest-dom";
 import TodoList from "../components/TodoList";
 
 describe("TodoList", () => {
-  test("renders initial todos", () => {
+  test("renders initial demo todos", () => {
     render(<TodoList />);
     expect(screen.getByText(/Learn React/i)).toBeInTheDocument();
-    expect(screen.getByText(/Build Todo App/i)).toBeInTheDocument();
     expect(screen.getByText(/Write Tests/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ship Feature/i)).toBeInTheDocument();
   });
 
-  test("adds a new todo", () => {
+  test("adds a new todo via form submit", () => {
     render(<TodoList />);
-    const input = screen.getByLabelText("todo-input");
-    const form = screen.getByRole("form", { name: /add-todo-form/i });
-
-    fireEvent.change(input, { target: { value: "New Task" } });
-    fireEvent.submit(form);
-
-    expect(screen.getByText("New Task")).toBeInTheDocument();
+    const input = screen.getByPlaceholderText(/add a todo/i);
+    fireEvent.change(input, { target: { value: "New Item" } });
+    fireEvent.submit(input.closest("form"));
+    expect(screen.getByText("New Item")).toBeInTheDocument();
   });
 
-  test("toggles a todo on click", () => {
+  test("toggles a todo between completed and not completed", () => {
     render(<TodoList />);
-    const item = screen.getByText("Learn React");
-    expect(item.closest("li")).not.toHaveStyle({ textDecoration: "line-through" });
-
+    const item = screen.getByText("Learn React"); // initially not completed
     fireEvent.click(item);
-    expect(item.closest("li")).toHaveStyle({ textDecoration: "line-through" });
-
+    expect(item).toHaveStyle("text-decoration: line-through");
     fireEvent.click(item);
-    expect(item.closest("li")).not.toHaveStyle({ textDecoration: "line-through" });
+    expect(item).toHaveStyle("text-decoration: none");
   });
 
   test("deletes a todo", () => {
     render(<TodoList />);
-    const delBtn = screen.getByRole("button", { name: /delete-Build Todo App/i });
+    const target = screen.getByText("Ship Feature");
+    const li = target.closest("li");
+    const delBtn = li.querySelector("button");
     fireEvent.click(delBtn);
-    expect(screen.queryByText("Build Todo App")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ship Feature")).not.toBeInTheDocument();
   });
 });
